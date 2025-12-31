@@ -2,21 +2,63 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>在庫一覧</title>
+    <title>Loss Zero</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: sans-serif;
+        }
+        header {
+            background: black;
+            color: white;
+            padding: 16px;
+            text-align: center;
+            font-size: 24px;
+        }
+        .container {
+            display: flex;
+            height: calc(100vh - 64px);
+        }
+        .left {
+            width: 280px;
+            background: #f0f0f0;
+            padding: 24px;
+        }
+        .right {
+            flex: 1;
+            padding: 24px;
+        }
+    </style>
 </head>
 <body>
-    <h1>在庫一覧</h1>
 
-    {% if items %}
+<header>Loss Zero</header>
+
+<div class="container">
+    <!-- 左：登録 -->
+    <div class="left">
+        <h3>在庫登録</h3>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">在庫へ追加</button>
+        </form>
+    </div>
+
+    <!-- 右：一覧 -->
+    <div class="right">
+        <h3>在庫一覧</h3>
         <ul>
             {% for item in items %}
                 <li>
-                    {{ item.name }}｜賞味期限：{{ item.expiration_date }}
+                    {{ item.name }}（{{ item.expiration_date }}）
                 </li>
+            {% empty %}
+                <li>在庫はまだありません</li>
             {% endfor %}
         </ul>
-    {% else %}
-        <p>アイテムが登録されていません。</p>
-    {% endif %}
+    </div>
+</div>
+
 </body>
 </html>
