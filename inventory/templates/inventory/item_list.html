@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>在庫一覧</title>
+</head>
+<body>
+    <h1>在庫一覧</h1>
+
+    {% if items %}
+        <ul>
+            {% for item in items %}
+                <li>
+                    {{ item.name }}｜賞味期限：{{ item.expiration_date }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>アイテムが登録されていません。</p>
+    {% endif %}
+</body>
+</html>

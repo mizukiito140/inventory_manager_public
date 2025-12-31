@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.log
+
+# 仮想環境
+venv/
+.env
+.env.*
+
+# Django
+*.sqlite3
+/media/
+staticfiles/
+
+# Django secrets (個人情報・秘密情報)
+local_settings.py
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
