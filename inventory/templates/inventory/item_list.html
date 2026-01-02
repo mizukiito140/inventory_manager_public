@@ -1,75 +1,30 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>Loss Zero</title>
-    <style>
-        body {
-            margin: 0;
-            font-family: sans-serif;
-        }
-        header {
-            background: black;
-            color: white;
-            padding: 16px;
-            text-align: center;
-            font-size: 24px;
-        }
-        .container {
-            display: flex;
-            height: calc(100vh - 64px);
-        }
-        .left {
-            width: 280px;
-            background: #f0f0f0;
-            padding: 24px;
-        }
-        .right {
-            flex: 1;
-            padding: 24px;
-        }
-        .item-actions {
-            display: inline;
-            margin-left: 8px;
-        }
-    </style>
-</head>
-<body>
+<h1>在庫一覧</h1>
 
-<header>Loss Zero</header>
-
-<div class="container">
-    <!-- 左：登録 -->
-    <div class="left">
-        <h3>在庫登録</h3>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">在庫へ追加</button>
-        </form>
-    </div>
-
-    <!-- 右：一覧 -->
-    <div class="right">
-        <h3>在庫一覧</h3>
-        <ul>
-            {% for item in items %}
-                <li>
-                    {{ item.name }}（{{ item.expiration_date }}）
-                    <span class="item-actions">
-                        <a href="{% url 'inventory:item_edit' item.pk %}">編集</a>
-                        <form method="post" action="{% url 'inventory:item_delete' item.pk %}" style="display:inline">
-                            {% csrf_token %}
-                            <button type="submit">削除</button>
-                        </form>
-                    </span>
-                </li>
-            {% empty %}
-                <li>在庫はまだありません</li>
-            {% endfor %}
-        </ul>
-    </div>
-</div>
-
-</body>
-</html>
+<!-- 登録フォーム -->
+<h2>新規登録</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">登録</button>
+</form>
+<!-- 一覧テーブル -->
+<table border="1" style="margin-top:20px;">
+    <tr>
+        <th>名前</th>
+        <th>賞味期限</th>
+        <th>操作</th>
+    </tr>
+    {% for item in items %}
+    <tr>
+        <td style="color: {{ item.color }};">
+            {{ item.name }}
+            {% if item.color == 'brown' %}⚠️{% endif %}
+        </td>
+        <td>{{ item.expiration_date }}</td>
+        <td>
+            <a href="{% url 'inventory:item_edit' item.id %}">編集</a>
+            <a href="{% url 'inventory:item_delete' item.id %}">削除</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
