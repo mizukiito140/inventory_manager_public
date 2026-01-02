@@ -28,6 +28,10 @@
             flex: 1;
             padding: 24px;
         }
+        .item-actions {
+            display: inline;
+            margin-left: 8px;
+        }
     </style>
 </head>
 <body>
@@ -52,6 +56,13 @@
             {% for item in items %}
                 <li>
                     {{ item.name }}（{{ item.expiration_date }}）
+                    <span class="item-actions">
+                        <a href="{% url 'inventory:item_edit' item.pk %}">編集</a>
+                        <form method="post" action="{% url 'inventory:item_delete' item.pk %}" style="display:inline">
+                            {% csrf_token %}
+                            <button type="submit">削除</button>
+                        </form>
+                    </span>
                 </li>
             {% empty %}
                 <li>在庫はまだありません</li>
