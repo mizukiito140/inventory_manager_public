@@ -19,8 +19,6 @@
 
 登録された食材＋賞味期限は一覧表示に追加されます。
 
-![食材登録](screenshots/item_create.mp4)
-
 ![食材登録](screenshots/item_create.gif)
 
 ### 一覧表示と色分け表示機能
@@ -39,7 +37,7 @@
 
 賞味期限が迫っている食材を消費したいとき、レシピのアイデアを得るのに便利です。
 
-![在庫一覧](screenshots/recipe_search.mp4)
+![在庫一覧](screenshots/recipe_search.gif)
 
 ## 学んだこと
 - Webアプリ開発の基本的な仕組みと開発のおおまかな流れ
