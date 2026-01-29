@@ -1,6 +1,7 @@
 <h2>在庫管理</h2>
 
 <div style="display: flex; gap: 20px;">
+
   <!-- 左：アイテム登録 -->
   <div style="width: 25%;">
     <h3>アイテム登録</h3>
@@ -14,41 +15,58 @@
   <!-- 中：在庫一覧 -->
   <div style="width: 40%;">
     <h3>在庫一覧</h3>
-    <ul>
-      {% for item in items %}
-        <li>
-          <strong>{{ item.name }}</strong>：
-          {% if item.days_left is not None %}
-            {% if item.days_left < 0 %}
-              <span style="color: sienna; font-weight:bold;">
-                {{ item.expiration_date }} ⚠️期限切れ
-              </span>
-            {% elif item.days_left <= 1 %}
-              <span style="color:red;">
-                {{ item.expiration_date }}（{{ item.days_left }}日前）
-              </span>
-            {% elif item.days_left == 2 %}
-              <span style="color:orange;">
-                {{ item.expiration_date }}（{{ item.days_left }}日前）
-              </span>
-            {% elif 2 < item.days_left <= 5 %}
-              <span style="color:green;">
-                {{ item.expiration_date }}（{{ item.days_left }}日前）
-              </span>
+
+    <table style="width:100%; border-collapse: collapse;">
+      <thead>
+        <tr>
+          <th style="text-align:left;">食品名</th>
+          <th style="text-align:left;">賞味期限</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+        <tr>
+          <!-- 食品名 + 操作 -->
+          <td style="vertical-align: top; padding-bottom: 10px;">
+            <strong>{{ item.name }}</strong><br>
+            <a href="{% url 'inventory:item_edit' item.id %}">編集</a> |
+            <a href="{% url 'inventory:item_delete' item.id %}">削除</a>
+          </td>
+
+          <!-- 賞味期限 -->
+          <td style="vertical-align: top;">
+            {% if item.days_left is not None %}
+              {% if item.days_left < 0 %}
+                <span style="color: sienna; font-weight:bold;">
+                  {{ item.expiration_date }} ⚠️期限切れ
+                </span>
+              {% elif item.days_left <= 1 %}
+                <span style="color:red;">
+                  {{ item.expiration_date }}（{{ item.days_left }}日前）
+                </span>
+              {% elif item.days_left == 2 %}
+                <span style="color:orange;">
+                  {{ item.expiration_date }}（{{ item.days_left }}日前）
+                </span>
+              {% elif 2 < item.days_left <= 5 %}
+                <span style="color:green;">
+                  {{ item.expiration_date }}（{{ item.days_left }}日前）
+                </span>
+              {% else %}
+                {{ item.expiration_date }}
+              {% endif %}
             {% else %}
-              {{ item.expiration_date }}
+              日付未登録
             {% endif %}
-          {% else %}
-            日付未登録
-          {% endif %}
-          <br>
-          <a href="{% url 'inventory:item_edit' item.id %}">編集</a> |
-          <a href="{% url 'inventory:item_delete' item.id %}">削除</a>
-        </li>
-      {% empty %}
-        <li>登録されているアイテムはありません</li>
-      {% endfor %}
-    </ul>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="2">登録されているアイテムはありません</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 
   <!-- 右：レシピ検索 -->
@@ -69,9 +87,10 @@
         </li>
       {% empty %}
         {% if keyword %}
-          <li>該当するレシピがありません</li>
+          <li>該当するレシピはありません</li>
         {% endif %}
       {% endfor %}
     </ul>
   </div>
+
 </div>
