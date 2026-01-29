@@ -1,9 +1,14 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import InventoryItem
-from .forms import InventoryItemForm
+import requests
 from datetime import date
 
+from django.conf import settings
+from django.shortcuts import render, redirect, get_object_or_404
+
+from .models import InventoryItem
+from .forms import InventoryItemForm
+
 def item_list(request):
+    # ---------- アイテム登録 ----------
     if request.method == 'POST':
         form = InventoryItemForm(request.POST)
         if form.is_valid():
@@ -12,35 +17,63 @@ def item_list(request):
     else:
         form = InventoryItemForm()
 
-    items = InventoryItem.objects.all()
+     # ---------- 在庫一覧 ----------
+    items = InventoryItem.objects.all().order_by("-id")
     today = date.today()
     for item in items:
-        delta = (item.expiration_date - today).days
-        if delta < 0:
-            item.color = 'brown'
-        elif delta == 0 or delta == 1:
-            item.color = 'red'
-        elif delta == 2:
-            item.color = 'orange'
-        elif 2 < delta <= 5:
-            item.color = 'green'
+        if item.expiration_date:
+            delta_days = (item.expiration_date - today).days
+            item.days_left = delta_days
         else:
-            item.color = ''
+            item.days_left = None
 
-    return render(request, 'inventory/item_list.html', {'items': items, 'form': form})
+    # ---------- Spoonacular レシピ検索 ----------
+    keyword = request.GET.get("q", "")
+    recipes = []
 
-def item_edit(request, pk):
-    item = get_object_or_404(InventoryItem, pk=pk)
-    if request.method == 'POST':
-        form = InventoryItemForm(request.POST, instance=item)
-        if form.is_valid():
-            form.save()
-            return redirect('inventory:item_list')
-    else:
-        form = InventoryItemForm(instance=item)
-    return render(request, 'inventory/item_edit.html', {'form': form, 'item': item})
+    if keyword:
+        url = "https://api.spoonacular.com/recipes/complexSearch"
+        params = {
+            "apiKey": settings.SPOONACULAR_API_KEY,
+            "query": keyword,
+            "number": 10,  # 最大件数
+        }
+
+        res = requests.get(url, params=params)
+        if res.status_code == 200:
+            data = res.json()
+            for r in data.get("results", []):
+                recipes.append({
+                    "title": r.get("title"),
+                    "url": f"https://spoonacular.com/recipes/{r.get('id')}",
+                    "image": r.get("image"),
+                })
+
+    context = {
+        "form": form,
+        "items": items,
+        "recipes": recipes,
+        "keyword": keyword,
+    }
+
+    return render(request, "inventory/item_list.html", context)
+
 
 def item_delete(request, pk):
     item = get_object_or_404(InventoryItem, pk=pk)
-    item.delete()
-    return redirect('inventory:item_list')
+    if request.method == "POST":
+        item.delete()
+        return redirect("inventory:item_list")
+    return render(request, "inventory/item_confirm_delete.html", {"item": item})
+
+
+def item_edit(request, pk):
+    item = get_object_or_404(InventoryItem, pk=pk)
+    if request.method == "POST":
+        form = InventoryItemForm(request.POST, instance=item)
+        if form.is_valid():
+            form.save()
+            return redirect("inventory:item_list")
+    else:
+        form = InventoryItemForm(instance=item)
+    return render(request, "inventory/item_edit.html", {"form": form})
