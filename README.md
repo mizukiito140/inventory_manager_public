@@ -36,6 +36,7 @@
 ![食材編集](screenshots/item_edit.gif)
 
 登録した食材の削除ができます。
+
 ![食材削除](screenshots/item_delete.gif)
 
 ### レシピ検索機能
