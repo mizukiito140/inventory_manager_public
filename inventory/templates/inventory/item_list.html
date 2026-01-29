@@ -77,10 +77,11 @@
       <button type="submit">検索</button>
     </form>
 
-    <ul>
+    <ul style="list-style:none; padding-left:0;">
       {% for recipe in recipes %}
-        <li>
-          <a href="{{ recipe.url }}" target="_blank">{{ recipe.title }}</a><br>
+        <li style="margin-bottom:15px;">
+          <!-- アプリ内の詳細ページにリンク -->
+          <a href="{% url 'inventory:recipe_detail' recipe.id %}">{{ recipe.title }}</a><br>
           {% if recipe.image %}
             <img src="{{ recipe.image }}" width="100">
           {% endif %}

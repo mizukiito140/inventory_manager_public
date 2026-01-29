@@ -7,6 +7,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import InventoryItem
 from .forms import InventoryItemForm
 
+
 def item_list(request):
     # ---------- アイテム登録 ----------
     if request.method == 'POST':
@@ -17,7 +18,7 @@ def item_list(request):
     else:
         form = InventoryItemForm()
 
-     # ---------- 在庫一覧 ----------
+    # ---------- 在庫一覧 ----------
     items = InventoryItem.objects.all().order_by("-id")
     today = date.today()
     for item in items:
@@ -45,7 +46,7 @@ def item_list(request):
             for r in data.get("results", []):
                 recipes.append({
                     "title": r.get("title"),
-                    "url": f"https://spoonacular.com/recipes/{r.get('id')}",
+                    "id": r.get("id"),  
                     "image": r.get("image"),
                 })
 
@@ -57,6 +58,21 @@ def item_list(request):
     }
 
     return render(request, "inventory/item_list.html", context)
+
+
+def recipe_detail(request, recipe_id):
+    """
+    Spoonacular API からレシピ詳細を取得して表示する
+    """
+    recipe = None
+    url = f"https://api.spoonacular.com/recipes/{recipe_id}/information"
+    params = {"apiKey": settings.SPOONACULAR_API_KEY}
+
+    res = requests.get(url, params=params)
+    if res.status_code == 200:
+        recipe = res.json()
+
+    return render(request, "inventory/recipe_detail.html", {"recipe": recipe})
 
 
 def item_delete(request, pk):

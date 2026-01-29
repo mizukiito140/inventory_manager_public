@@ -30,6 +30,14 @@
 
 ![在庫一覧](screenshots/item_list.png)
 
+### 食材・賞味期限 の 編集・削除
+登録した食材の食材名・賞味期限が編集できます。
+
+![食材編集](screenshots/item_edit.gif)
+
+登録した食材の削除ができます。
+![食材削除](screenshots/item_delete.gif)
+
 ### レシピ検索機能
 消費したい食材を検索ボックスに入力して検索すると、
 
@@ -37,7 +45,9 @@
 
 賞味期限が迫っている食材を消費したいとき、レシピのアイデアを得るのに便利です。
 
-![在庫一覧](screenshots/recipe_search.gif)
+![レシピ検索](screenshots/recipe_search.gif)
+
+![レシピ検索](screenshots/recipe_search_detail.gif)
 
 ## 学んだこと
 - Webアプリ開発の基本的な仕組みと開発のおおまかな流れ
