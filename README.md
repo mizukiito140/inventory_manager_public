@@ -45,11 +45,11 @@
 
 ![食材登録](screenshots/item_create.gif)
 
+
 <h3>一覧表示と色分け表示機能</h3>
 
 <div style="display: flex; gap: 24px; align-items: flex-start;">
 
-  <!-- 左：説明 -->
   <div style="width: 50%;">
     <p>
       登録された食材と賞味期限が一覧表示されます。<br>
@@ -62,12 +62,11 @@
       <li>賞味期限切れ → 茶色表示＋⚠️</li>
       <li>賞味期限当日・前日 → 赤色表示</li>
       <li>賞味期限2日前 → オレンジ色表示</li>
-      <li>賞味期限3～5日前 → 緑色表示</li>
+      <li>賞味期限3〜5日前 → 緑色表示</li>
       <li>賞味期限6日以上前 → デフォルト表示（黒色）</li>
     </ul>
   </div>
 
-  <!-- 右：画像 or 動画 -->
   <div style="width: 50%;">
     <img src="screenshots/item_list.png" alt="在庫一覧" width="100%">
   </div>
