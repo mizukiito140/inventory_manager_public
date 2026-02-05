@@ -1,16 +1,11 @@
-from datetime import date
 from typing import List
 
 from ..models import InventoryItem
 
 
-def get_items_with_days_left() -> List[InventoryItem]:
-    items = list(InventoryItem.objects.all().order_by("-id"))
-    today = date.today()
-
-    for item in items:
-        if item.expiration_date:
-            item.days_left = (item.expiration_date - today).days
-        else:
-            item.days_left = None
-    return items
+def get_items() -> List[InventoryItem]:
+    """
+    在庫アイテムを新しい順で取得する。
+    days_left は InventoryItem.days_left @property で計算される。
+    """
+    return list(InventoryItem.objects.all().order_by("-id"))

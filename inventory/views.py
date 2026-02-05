@@ -1,10 +1,9 @@
-# inventory/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_http_methods, require_GET
 
 from .models import InventoryItem
 from .forms import InventoryItemForm
-from .services.inventory_service import get_items_with_days_left
+from .services.inventory_service import get_items
 from .services.spoonacular_service import search_recipes, fetch_recipe_detail
 
 
@@ -26,7 +25,7 @@ def item_list(request):
         return redirect_response
 
     # 2) 在庫一覧 + days_left 付与
-    items = get_items_with_days_left()
+    items = get_items()
 
     # 3) 初期表示時や「JSなしでGET検索」した場合にも表示できるよう残す
     keyword = request.GET.get("q", "").strip()
