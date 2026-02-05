@@ -1,7 +1,0 @@
-<h1>{% if form.instance.pk %}編集{% else %}登録{% endif %}</h1>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">保存</button>
-</form>
-<a href="{% url 'item_list' %}">一覧に戻る</a>
