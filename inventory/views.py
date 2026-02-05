@@ -1,43 +1,32 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_http_methods, require_GET
+from django.http import Http404
 
 from .models import InventoryItem
 from .forms import InventoryItemForm
 from .services.inventory_service import get_items
 from .services.spoonacular_service import search_recipes, fetch_recipe_detail
 
-
-def _handle_item_create(request):
+@require_http_methods(["GET", "POST"])
+def item_list(request):
     if request.method == "POST":
         form = InventoryItemForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect("inventory:item_list"), None
-        return None, form
-    return None, InventoryItemForm()
+            return redirect("inventory:item_list")
+    else:
+        form = InventoryItemForm()
 
-
-@require_http_methods(["GET", "POST"])
-def item_list(request):
-    # 1) アイテム登録（POST）
-    redirect_response, form = _handle_item_create(request)
-    if redirect_response:
-        return redirect_response
-
-    # 2) 在庫一覧 + days_left 付与
     items = get_items()
-
-    # 3) 初期表示時や「JSなしでGET検索」した場合にも表示できるよう残す
     keyword = request.GET.get("q", "").strip()
     recipes = search_recipes(keyword)
 
-    context = {
+    return render(request, "inventory/item_list.html", {
         "form": form,
         "items": items,
         "recipes": recipes,
         "keyword": keyword,
-    }
-    return render(request, "inventory/item_list.html", context)
+    })
 
 
 @require_GET
@@ -62,6 +51,8 @@ def recipe_search(request):
 
 def recipe_detail(request, recipe_id):
     recipe = fetch_recipe_detail(recipe_id)
+    if recipe is None:
+        raise Http404("Recipe not found")
     return render(request, "inventory/recipe_detail.html", {"recipe": recipe})
 
 

@@ -1,7 +1,17 @@
-<h1>削除確認</h1>
-<p>{{ item.name }} を削除してよいですか？</p>
-<form method="post">
+{% extends "inventory/base.html" %}
+
+{% block title %}削除確認{% endblock %}
+
+{% block content %}
+<h2 class="page-title">削除確認</h2>
+
+<section class="card">
+  <p><strong>{{ item.name }}</strong> を削除してよいですか？</p>
+
+  <form method="post">
     {% csrf_token %}
-    <button type="submit">削除</button>
-</form>
-<a href="{% url 'inventory:item_list' %}">キャンセル</a>
+    <button class="btn btn-danger" type="submit">削除</button>
+    <a class="btn" href="{% url 'inventory:item_list' %}" style="margin-left: 8px;">キャンセル</a>
+  </form>
+</section>
+{% endblock %}

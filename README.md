@@ -86,6 +86,39 @@
 
 ![レシピ検索](screenshots/recipe_search_detail.gif)
 
+## 画面・URL設計（導線 → URL詳細）
+
+### ユーザー視点の導線（操作フロー）
+- アプリにアクセス：`/` → `/items/`（在庫一覧画面へ）
+- 在庫を登録：`/items/` で食品名・賞味期限を入力 → 登録 → 一覧に反映
+- 在庫を編集：一覧の「編集」→ 編集画面 → 保存 → 一覧へ戻る
+- 在庫を削除：一覧の「削除」→ 確認画面 → 削除 → 一覧へ戻る
+- レシピを探す：`/items/` 右カラムでキーワード検索 → 検索結果が右カラムだけ更新
+- レシピ詳細を見る：検索結果のレシピをクリック → 詳細ページ → 戻る
+
+---
+
+### URL設計（エンドポイント仕様）
+本アプリは「在庫一覧 + 登録 + レシピ検索」を `/items/` に集約し、編集・削除・レシピ詳細のみ個別ページに分けています。  
+また、レシピ検索はページ全体を再描画せず、右カラムのみ非同期で更新します。
+
+| URL | Method | View | Template | 返すもの | 用途 / 補足 |
+|---|---:|---|---|---|---|
+| `/` | GET | - | - | Redirect → `/items/` | ルートアクセスは一覧画面へ誘導 |
+| `/items/` | GET | `item_list` | `inventory/item_list.html` | Full HTML | 在庫一覧 + 登録フォーム + レシピ検索UIを表示（`q` があれば初期検索に反映） |
+| `/items/` | POST | `item_list` | - | Redirect → `/items/` | アイテム登録（PRGパターンで二重送信を防止） |
+| `/items/edit/<int:pk>/` | GET | `item_edit` | `inventory/item_edit.html` | Full HTML | 編集フォーム表示 |
+| `/items/edit/<int:pk>/` | POST | `item_edit` | - | Redirect → `/items/` | 編集内容を保存して一覧へ戻る |
+| `/items/delete/<int:pk>/` | GET | `item_delete` | `inventory/item_confirm_delete.html` | Full HTML | 削除確認画面（誤削除防止） |
+| `/items/delete/<int:pk>/` | POST | `item_delete` | - | Redirect → `/items/` | 削除実行して一覧へ戻る |
+| `/items/recipe-search/` | GET | `recipe_search` | `inventory/_recipe_results.html` | Partial HTML | JS(fetch)で呼び出し、レシピ検索結果部分のみ差し替え |
+| `/items/recipe/<int:recipe_id>/` | GET | `recipe_detail` | `inventory/recipe_detail.html` | Full HTML | レシピ詳細表示（取得できない場合は404） |
+
+### 非同期更新（右カラム差し替え）
+`/items/recipe-search/?q=...` はページ全体ではなく **検索結果のHTML断片（partial）** を返します。  
+`inventory/static/inventory/app.js` から fetch し、返ってきたHTMLを `#recipe-results` に差し込むことで右カラムのみ更新します。
+
+
 ## 学んだこと
 - Webアプリ開発の基本的な仕組みと開発のおおまかな流れ
 - Linuxの使い方

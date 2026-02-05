@@ -1,28 +1,40 @@
-<h2>{{ recipe.title }}</h2>
+{% extends "inventory/base.html" %}
+
+{% block title %}レシピ詳細{% endblock %}
+
+{% block content %}
+<h2 class="page-title">{{ recipe.title }}</h2>
 
 {% if recipe.image %}
-<img src="{{ recipe.image }}" width="300">
+  <img class="detail-image" src="{{ recipe.image }}" alt="{{ recipe.title }}">
 {% endif %}
 
-<h3>概要</h3>
-<p>{{ recipe.summary }}</p>
+<section class="card" style="margin-top: 16px;">
+  <h3 class="card-title">概要</h3>
+  <p>{{ recipe.summary }}</p>
+</section>
 
-<h3>材料</h3>
-<ul>
-  {% for ing in recipe.extendedIngredients %}
-    <li>{{ ing.original }}</li>
-  {% endfor %}
-</ul>
-
-<h3>手順</h3>
-{% if recipe.analyzedInstructions %}
-  <ol>
-    {% for step in recipe.analyzedInstructions.0.steps %}
-      <li>{{ step.step }}</li>
+<section class="card" style="margin-top: 16px;">
+  <h3 class="card-title">材料</h3>
+  <ul>
+    {% for ing in recipe.extendedIngredients %}
+      <li>{{ ing.original }}</li>
     {% endfor %}
-  </ol>
-{% else %}
-  <p>手順はありません</p>
-{% endif %}
+  </ul>
+</section>
 
-<a href="{% url 'inventory:item_list' %}">検索に戻る</a>
+<section class="card" style="margin-top: 16px;">
+  <h3 class="card-title">手順</h3>
+  {% if recipe.analyzedInstructions %}
+    <ol>
+      {% for step in recipe.analyzedInstructions.0.steps %}
+        <li>{{ step.step }}</li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <p>手順はありません</p>
+  {% endif %}
+</section>
+
+<a class="back-link" href="{% url 'inventory:item_list' %}">検索に戻る</a>
+{% endblock %}

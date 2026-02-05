@@ -1,9 +1,9 @@
-<ul style="list-style:none; padding-left:0;">
+<ul class="recipe-list">
   {% for recipe in recipes %}
-    <li style="margin-bottom:15px;">
-      <a href="{% url 'inventory:recipe_detail' recipe.id %}">{{ recipe.title }}</a><br>
+    <li>
+      <a href="{% url 'inventory:recipe_detail' recipe.id %}">{{ recipe.title }}</a>
       {% if recipe.image %}
-        <img src="{{ recipe.image }}" width="100">
+        <img class="recipe-thumb" src="{{ recipe.image }}" alt="{{ recipe.title }}">
       {% endif %}
     </li>
   {% empty %}
