@@ -1,5 +1,6 @@
+# inventory/views.py
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_GET
 
 from .models import InventoryItem
 from .forms import InventoryItemForm
@@ -19,12 +20,15 @@ def _handle_item_create(request):
 
 @require_http_methods(["GET", "POST"])
 def item_list(request):
+    # 1) アイテム登録（POST）
     redirect_response, form = _handle_item_create(request)
     if redirect_response:
         return redirect_response
 
+    # 2) 在庫一覧 + days_left 付与
     items = get_items_with_days_left()
 
+    # 3) 初期表示時や「JSなしでGET検索」した場合にも表示できるよう残す
     keyword = request.GET.get("q", "").strip()
     recipes = search_recipes(keyword)
 
@@ -35,6 +39,26 @@ def item_list(request):
         "keyword": keyword,
     }
     return render(request, "inventory/item_list.html", context)
+
+
+@require_GET
+def recipe_search(request):
+    """
+    /items/recipe-search/ 用
+    レシピ検索結果のHTML“だけ”を返す（部分テンプレ）。
+    item_list.html 側で fetch して右カラムだけ差し替える想定。
+    """
+    keyword = request.GET.get("q", "").strip()
+    recipes = search_recipes(keyword)
+
+    return render(
+        request,
+        "inventory/_recipe_results.html",
+        {
+            "recipes": recipes,
+            "keyword": keyword,
+        },
+    )
 
 
 def recipe_detail(request, recipe_id):

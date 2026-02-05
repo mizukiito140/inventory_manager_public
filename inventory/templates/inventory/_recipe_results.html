@@ -1,0 +1,14 @@
+<ul style="list-style:none; padding-left:0;">
+  {% for recipe in recipes %}
+    <li style="margin-bottom:15px;">
+      <a href="{% url 'inventory:recipe_detail' recipe.id %}">{{ recipe.title }}</a><br>
+      {% if recipe.image %}
+        <img src="{{ recipe.image }}" width="100">
+      {% endif %}
+    </li>
+  {% empty %}
+    {% if keyword %}
+      <li>該当するレシピはありません</li>
+    {% endif %}
+  {% endfor %}
+</ul>

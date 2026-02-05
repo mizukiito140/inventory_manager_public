@@ -72,26 +72,25 @@
   <!-- 右：レシピ検索 -->
   <div style="width: 35%; padding:10px; border-left:1px solid #ccc;">
     <h3>レシピ検索</h3>
-    <form method="get">
+
+    <form id="recipe-search-form">
       <input type="text" name="q" value="{{ keyword }}" placeholder="例：卵">
       <button type="submit">検索</button>
     </form>
 
-    <ul style="list-style:none; padding-left:0;">
-      {% for recipe in recipes %}
-        <li style="margin-bottom:15px;">
-          <!-- アプリ内の詳細ページにリンク -->
-          <a href="{% url 'inventory:recipe_detail' recipe.id %}">{{ recipe.title }}</a><br>
-          {% if recipe.image %}
-            <img src="{{ recipe.image }}" width="100">
-          {% endif %}
-        </li>
-      {% empty %}
-        {% if keyword %}
-          <li>該当するレシピはありません</li>
-        {% endif %}
-      {% endfor %}
-    </ul>
+    <div id="recipe-results">
+      {% include "inventory/_recipe_results.html" with recipes=recipes keyword=keyword %}
+    </div>
+
+    <script>
+    document.getElementById("recipe-search-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const q = e.target.querySelector('input[name="q"]').value;
+      const res = await fetch("{% url 'inventory:recipe_search' %}?q=" + encodeURIComponent(q));
+      const html = await res.text();
+      document.getElementById("recipe-results").innerHTML = html;
+    });
+    </script>
   </div>
 
 </div>
