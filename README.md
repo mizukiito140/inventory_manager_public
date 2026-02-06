@@ -73,17 +73,17 @@
 本アプリは「在庫一覧 + 登録 + レシピ検索」を `/items/` に集約し、編集・削除・レシピ詳細のみ個別ページに分けています。  
 また、レシピ検索はページ全体を再描画せず、右カラムのみ非同期で更新します。
 
-| URL | Method | View | Template | 返すもの | 用途 / 補足 |
-|---|---:|---|---|---|---|
-| `/` | GET | - | - | Redirect → `/items/` | ルートアクセスは一覧画面へ誘導 |
-| `/items/` | GET | `item_list` | `inventory/item_list.html` | Full HTML | 在庫一覧 + 登録フォーム + レシピ検索UIを表示（`q` があれば初期検索に反映） |
-| `/items/` | POST | `item_list` | - | Redirect → `/items/` | アイテム登録（PRGパターンで二重送信を防止） |
-| `/items/edit/<int:pk>/` | GET | `item_edit` | `inventory/item_edit.html` | Full HTML | 編集フォーム表示 |
-| `/items/edit/<int:pk>/` | POST | `item_edit` | - | Redirect → `/items/` | 編集内容を保存して一覧へ戻る |
-| `/items/delete/<int:pk>/` | GET | `item_delete` | `inventory/item_confirm_delete.html` | Full HTML | 削除確認画面（誤削除防止） |
-| `/items/delete/<int:pk>/` | POST | `item_delete` | - | Redirect → `/items/` | 削除実行して一覧へ戻る |
-| `/items/recipe-search/` | GET | `recipe_search` | `inventory/_recipe_results.html` | Partial HTML | JS(fetch)で呼び出し、レシピ検索結果部分のみ差し替え |
-| `/items/recipe/<int:recipe_id>/` | GET | `recipe_detail` | `inventory/recipe_detail.html` | Full HTML | レシピ詳細表示（取得できない場合は404） |
+|URL|メソッド|View|レスポンス|用途 / 補足|
+|---|---:|---|---|---|
+|`/`|GET| - |Redirect → `/items/`|ルートアクセスは一覧画面へ誘導|
+|`/items/`|GET|`item_list`|ページHTML<br>`item_list.html`|在庫一覧 + 登録フォーム + レシピ検索UIを表示|
+|`/items/`|POST|`item_list`|Redirect → `/items/`|アイテム登録（PRGパターンで二重送信を防止）|
+|`/items/edit/<int:pk>/`|GET|`item_edit`|ページHTML<br>`item_edit.html`|編集フォーム表示|
+|`/items/edit/<int:pk>/`|POST|`item_edit`|Redirect → `/items/`|編集内容を保存して一覧へ戻る|
+|`/items/delete/<int:pk>/`|GET|`item_delete`|ページHTML<br>`item_confirm_delete.html`|削除確認画面（誤削除防止）|
+|`/items/delete/<int:pk>/`|POST|`item_delete`| - |Redirect → `/items/`|削除実行して一覧へ戻る|
+|`/items/recipe-search/`|GET|`recipe_search`|部分HTML<br>`_recipe_results.html`|JS(fetch)で呼び出し、レシピ検索結果部分のみ差し替え|
+|`/items/recipe/<int:recipe_id>/`|GET|`recipe_detail`|ページHTML<br>`recipe_detail.html`|レシピ詳細表示（取得できない場合は404）|
 
 ### 非同期更新（右カラム差し替え）
 `/items/recipe-search/?q=...` はページ全体ではなく **検索結果のHTML断片（partial）** を返します。  
