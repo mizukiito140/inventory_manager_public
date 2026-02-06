@@ -44,20 +44,21 @@
 ![在庫一覧](screenshots/item_list.png)
 
 ### 食材・賞味期限 の 編集・削除
-登録した食材の食材名・賞味期限が編集できます。  
-![食材編集](screenshots/item_edit.gif)
-
-登録した食材の削除ができます。  
+  登録した食材の削除ができます。  
 ![食材削除](screenshots/item_delete.gif)
+![削除確認](screenshots/delete_confirm.png)
+
+登録した食材の食材名・賞味期限が編集できます。
+![食材編集](screenshots/item_edit.gif)
+![編集画面](screenshots/item_edit_confirm.png)
 
 ### レシピ検索機能
 消費したい食材を検索ボックスに入力して検索すると、  
 その食材を使用したレシピの検索結果が一覧表示されます。  
 賞味期限が迫っている食材を消費したいとき、レシピのアイデアを得るのに便利です。
-
 ![レシピ検索](screenshots/recipe_search.gif)
-
-![レシピ検索](screenshots/recipe_search_detail.gif)
+![レシピ一覧](screenshots/recipe_list.png)
+![レシピ詳細](screenshots/recipe_detail.png)
 
 ## 画面・URL設計
 ### 操作フロー
