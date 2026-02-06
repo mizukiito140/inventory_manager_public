@@ -81,7 +81,7 @@
 |`/items/edit/<int:pk>/`|GET|`item_edit`|ページHTML<br>`item_edit.html`|編集フォーム表示|
 |`/items/edit/<int:pk>/`|POST|`item_edit`|Redirect → `/items/`|編集内容を保存して一覧へ戻る|
 |`/items/delete/<int:pk>/`|GET|`item_delete`|ページHTML<br>`item_confirm_delete.html`|削除確認画面（誤削除防止）|
-|`/items/delete/<int:pk>/`|POST|`item_delete`| - |Redirect → `/items/`|削除実行して一覧へ戻る|
+|`/items/delete/<int:pk>/`|POST|`item_delete`|Redirect → `/items/`|削除実行して一覧へ戻る|
 |`/items/recipe-search/`|GET|`recipe_search`|部分HTML<br>`_recipe_results.html`|JS(fetch)で呼び出し、レシピ検索結果部分のみ差し替え|
 |`/items/recipe/<int:recipe_id>/`|GET|`recipe_detail`|ページHTML<br>`recipe_detail.html`|レシピ詳細表示（取得できない場合は404）|
 
