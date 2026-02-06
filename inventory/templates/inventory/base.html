@@ -8,13 +8,6 @@
   <link rel="stylesheet" href="{% static 'inventory/style.css' %}">
 </head>
 <body>
-  <header class="site-header">
-    <div class="container header-inner">
-      <div class="site-title">
-        <a href="{% url 'inventory:item_list' %}">在庫管理</a>
-      </div>
-    </div>
-  </header>
 
   <main class="container">
     {% block content %}{% endblock %}
