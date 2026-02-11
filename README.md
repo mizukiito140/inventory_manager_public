@@ -181,7 +181,8 @@ def search_recipes(keyword: str, number: int = 10) -> List[Dict]:
         {"title": r.get("title"), "id": r.get("id"), "image": r.get("image")}
         for r in (data.get("results", []) or [])
     ]
-</details>```
+</details>
+```
 
 ## その他設計で工夫した点
 ### 1. 秘密情報はコードに直接書かない（環境変数 + .env）
