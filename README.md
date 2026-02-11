@@ -109,6 +109,76 @@
 - 実際の処理の中身は役割ごとに分割し、service層に取り出してビューから呼び出す
 
 この対策により、UI要件は維持したまま、保守性・拡張性も考慮した設計にしました。
+<details> <summary>コード例（views.py：HTTP制御に専念し、処理はservice層へ委譲）</summary>
+
+# inventory/views.py
+from django.shortcuts import render, redirect
+from django.views.decorators.http import require_http_methods
+
+from .forms import InventoryItemForm
+from .services.inventory_service import get_items
+from .services.spoonacular_service import search_recipes
+
+@require_http_methods(["GET", "POST"])
+def item_list(request):
+    # ---------- アイテム登録（POST） ----------
+    if request.method == "POST":
+        form = InventoryItemForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("inventory:item_list")
+    else:
+        form = InventoryItemForm()
+
+    # ---------- 一覧取得（service層） ----------
+    items = get_items()
+
+    # ---------- レシピ検索（service層） ----------
+    keyword = request.GET.get("q", "").strip()
+    recipes = search_recipes(keyword)
+
+    # ---------- レスポンス返却（テンプレへ受け渡し） ----------
+    return render(request, "inventory/item_list.html", {
+        "form": form,
+        "items": items,
+        "recipes": recipes,
+        "keyword": keyword,
+    })
+
+</details> <details> <summary>コード例（service層：DB取得の切り出し）</summary>
+
+# inventory/services/inventory_service.py
+from django.db.models import QuerySet
+from ..models import InventoryItem
+
+def get_items() -> QuerySet[InventoryItem]:
+    return InventoryItem.objects.all().order_by("-id")
+
+</details> <details> <summary>コード例（service層：外部API呼び出しの切り出し：検索）</summary>
+# inventory/services/spoonacular_service.py（検索）
+from typing import Dict, List
+import requests
+from django.conf import settings
+
+def search_recipes(keyword: str, number: int = 10) -> List[Dict]:
+    if not keyword:
+        return []
+
+    url = "https://api.spoonacular.com/recipes/complexSearch"
+    params = {"apiKey": settings.SPOONACULAR_API_KEY, "query": keyword, "number": number}
+
+    try:
+        res = requests.get(url, params=params, timeout=10)
+        res.raise_for_status()
+        data = res.json()
+    except requests.RequestException:
+        return []
+
+    return [
+        {"title": r.get("title"), "id": r.get("id"), "image": r.get("image")}
+        for r in (data.get("results", []) or [])
+    ]
+</details>
 
 ## その他設計で工夫した点
 ### 1. 秘密情報はコードに直接書かない（環境変数 + .env）

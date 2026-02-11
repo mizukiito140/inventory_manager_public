@@ -9,6 +9,8 @@ from .services.spoonacular_service import search_recipes, fetch_recipe_detail
 
 @require_http_methods(["GET", "POST"])
 def item_list(request):
+
+    # ---------- アイテム登録（POST） ----------
     if request.method == "POST":
         form = InventoryItemForm(request.POST)
         if form.is_valid():
@@ -17,10 +19,14 @@ def item_list(request):
     else:
         form = InventoryItemForm()
 
+    # ---------- 一覧取得（service層） ----------
     items = get_items()
+
+    # ---------- レシピ検索（service層） ----------
     keyword = request.GET.get("q", "").strip()
     recipes = search_recipes(keyword)
-
+    
+    # ---------- レスポンス返却（テンプレへ受け渡し） ----------
     return render(request, "inventory/item_list.html", {
         "form": form,
         "items": items,
