@@ -109,8 +109,10 @@
 - 実際の処理の中身は役割ごとに分割し、service層に取り出してビューから呼び出す
 
 この対策により、UI要件は維持したまま、保守性・拡張性も考慮した設計にしました。
-<details> <summary>コード例（views.py：HTTP制御に専念し、処理はservice層へ委譲）</summary>
+<details>
+<summary>コード例（views.py：HTTP制御に専念し、処理はservice層へ委譲）</summary>
 
+```python
 # inventory/views.py
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
@@ -145,7 +147,7 @@ def item_list(request):
         "keyword": keyword,
     })
 
-</details> <details> <summary>コード例（service層：DB取得の切り出し）</summary>
+</details><details><summary>コード例（service層：DB取得の切り出し）</summary>
 
 # inventory/services/inventory_service.py
 from django.db.models import QuerySet
@@ -154,7 +156,8 @@ from ..models import InventoryItem
 def get_items() -> QuerySet[InventoryItem]:
     return InventoryItem.objects.all().order_by("-id")
 
-</details> <details> <summary>コード例（service層：外部API呼び出しの切り出し：検索）</summary>
+</details><details><summary>コード例（service層：外部API呼び出しの切り出し：検索）</summary>
+
 # inventory/services/spoonacular_service.py（検索）
 from typing import Dict, List
 import requests
@@ -178,7 +181,7 @@ def search_recipes(keyword: str, number: int = 10) -> List[Dict]:
         {"title": r.get("title"), "id": r.get("id"), "image": r.get("image")}
         for r in (data.get("results", []) or [])
     ]
-</details>
+</details>```
 
 ## その他設計で工夫した点
 ### 1. 秘密情報はコードに直接書かない（環境変数 + .env）
