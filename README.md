@@ -193,9 +193,50 @@ def search_recipes(keyword: str, number: int = 10) -> List[Dict]:
 ### 2. アイテムの削除は確認画面を挟み、うっかり削除を防止
 削除機能は `GET=確認画面表示 / POST=削除実行` に分けています。  
 削除URLを開いただけ(GETだけ)では削除は実行されないので、意図しない削除を防止します。
+<details> <summary>コード例（views.py：GET=確認画面 / POST=削除実行）</summary>
+
+```python
+# inventory/views.py
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import InventoryItem
+
+def item_delete(request, pk):
+    item = get_object_or_404(InventoryItem, pk=pk)
+    if request.method == "POST":
+        item.delete()
+        return redirect("inventory:item_list")
+    return render(request, "inventory/item_confirm_delete.html", {"item": item})
+```
+</details> <details> <summary>コード例（item_confirm_delete.html：削除はPOSTでのみ送信）</summary>
+
+```html
+<!-- inventory/templates/inventory/item_confirm_delete.html -->
+<form method="post">
+  {% csrf_token %}
+  <button class="btn btn-danger" type="submit">削除</button>
+  <a class="btn" href="{% url 'inventory:item_list' %}" style="margin-left: 8px;">キャンセル</a>
+</form>
+```
+</details>
 
 ### 3. アイテムの編集・削除はPRGパターンによりPOST二重送信を防止
 削除・編集のPOST処理後にリダイレクトし、その後GETで一覧表示画面を表示させることで、<br>リロードによるPOST再送を防止します。
+<details> <summary>コード例（views.py：PRG：編集 POST後にredirect）</summary>
+
+```python
+# inventory/views.py（編集）
+def item_edit(request, pk):
+    item = get_object_or_404(InventoryItem, pk=pk)
+    if request.method == "POST":
+        form = InventoryItemForm(request.POST, instance=item)
+        if form.is_valid():
+            form.save()
+            return redirect("inventory:item_list")
+    else:
+        form = InventoryItemForm(instance=item)
+    return render(request, "inventory/item_edit.html", {"form": form})
+```
+</details>
 
 ### 4. 日付計算ロジックはモデルに寄せ、テンプレートで計算しない
 賞味期限の残日数は models.py の `InventoryItem.days_left`（property）で計算し、テンプレートでは計算せず、<br>表示に必要な `item.days_left` を参照するだけにしています。  
@@ -209,6 +250,68 @@ View/Service側で日付計算を毎回書かずに済むため、修正箇所�
 - `app.js`：fetchで取得し、`#recipe-results` だけ差し替え
 
 また、検索結果の表示を`_recipe_results.html`に切り出したことで、保守性がUPしました。
+<details> <summary>コード例（urls.py：部分更新用エンドポイント）</summary>
+
+```python
+# inventory/urls.py
+from django.urls import path
+from .views import recipe_search
+
+urlpatterns = [
+    path("recipe-search/", recipe_search, name="recipe_search"),
+]
+```
+</details> <details> <summary>コード例（views.py：部分テンプレだけ返す）</summary>
+
+```python
+# inventory/views.py
+from django.views.decorators.http import require_GET
+from django.shortcuts import render
+from .services.spoonacular_service import search_recipes
+
+@require_GET
+def recipe_search(request):
+    keyword = request.GET.get("q", "").strip()
+    recipes = search_recipes(keyword)
+    return render(
+        request,
+        "inventory/_recipe_results.html",
+        {"recipes": recipes, "keyword": keyword},
+    )
+```
+</details> <details> <summary>コード例（item_list.html：フォームと差し替え先）</summary>
+
+```html
+<!-- inventory/templates/inventory/item_list.html（フォームと差し替え先） -->
+<form id="recipe-search-form" data-endpoint="{% url 'inventory:recipe_search' %}">
+  <div class="form-row">
+    <input type="text" name="q" value="{{ keyword }}" placeholder="例：卵">
+  </div>
+  <button class="btn btn-primary" type="submit">検索</button>
+</form>
+
+<div id="recipe-results">
+  {% include "inventory/_recipe_results.html" with recipes=recipes keyword=keyword %}
+</div>
+```
+</details> <details> <summary>コード例（app.js：fetchで部分HTML取得→差し替え）</summary>
+
+```javascript
+// inventory/static/inventory/app.js
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const q = form.querySelector('input[name="q"]').value;
+
+  try {
+    const res = await fetch(endpoint + "?q=" + encodeURIComponent(q));
+    const html = await res.text();
+    results.innerHTML = html;
+  } catch (err) {
+    results.innerHTML = "<p>検索に失敗しました。通信状況を確認してもう一度お試しください。</p>";
+  }
+});
+```
+</details>
 
 ### 6. 外部APIの連携処理は「検索結果一覧表示」と「レシピ詳細」を分離<br>⇒失敗しても画面が壊れないように設計
 Spoonacular APIは用途別に関数を分けています。
@@ -221,6 +324,58 @@ Spoonacular APIは用途別に関数を分けています。
 
 その結果、レシピ詳細の取得に失敗しても検索結果一覧や在庫リストまで巻き込まれず、
 レシピ検索に失敗しても、在庫一覧・登録フォームは表示されたまま利用できます。
+<details> <summary>コード例（spoonacular_service.py：検索は失敗時[] / 詳細は失敗時None）</summary>
+
+```python
+# inventory/services/spoonacular_service.py
+from typing import Dict, List, Optional
+import requests
+from django.conf import settings
+
+def search_recipes(keyword: str, number: int = 10) -> List[Dict]:
+    if not keyword:
+        return []
+
+    url = "https://api.spoonacular.com/recipes/complexSearch"
+    params = {"apiKey": settings.SPOONACULAR_API_KEY, "query": keyword, "number": number}
+
+    try:
+        res = requests.get(url, params=params, timeout=10)
+        res.raise_for_status()
+        data = res.json()
+    except requests.RequestException:
+        return []
+
+    return [
+        {"title": r.get("title"), "id": r.get("id"), "image": r.get("image")}
+        for r in (data.get("results", []) or [])
+    ]
+
+def fetch_recipe_detail(recipe_id: int) -> Optional[Dict]:
+    url = f"https://api.spoonacular.com/recipes/{recipe_id}/information"
+    params = {"apiKey": settings.SPOONACULAR_API_KEY}
+
+    try:
+        res = requests.get(url, params=params, timeout=10)
+        res.raise_for_status()
+        return res.json()
+    except requests.RequestException:
+        return None
+```
+</details> <details> <summary>コード例（views.py：詳細がNoneなら404に着地）</summary>
+
+```python
+# inventory/views.py（Noneなら404に着地）
+from django.http import Http404
+from .services.spoonacular_service import fetch_recipe_detail
+
+def recipe_detail(request, recipe_id):
+    recipe = fetch_recipe_detail(recipe_id)
+    if recipe is None:
+        raise Http404("Recipe not found")
+    return render(request, "inventory/recipe_detail.html", {"recipe": recipe})
+```
+</details>
 
 ## 学んだこと
 - Webアプリ開発の基本的な仕組みと開発のおおまかな流れ
