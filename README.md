@@ -146,18 +146,20 @@ def item_list(request):
         "recipes": recipes,
         "keyword": keyword,
     })
-
+```
 </details><details><summary>コード例（service層：DB取得の切り出し）</summary>
 
+```python
 # inventory/services/inventory_service.py
 from django.db.models import QuerySet
 from ..models import InventoryItem
 
 def get_items() -> QuerySet[InventoryItem]:
     return InventoryItem.objects.all().order_by("-id")
-
+```
 </details><details><summary>コード例（service層：外部API呼び出しの切り出し：検索）</summary>
 
+```python
 # inventory/services/spoonacular_service.py（検索）
 from typing import Dict, List
 import requests
