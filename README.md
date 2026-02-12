@@ -60,6 +60,15 @@
 ![レシピ一覧](screenshots/recipe_list.png)
 ![レシピ詳細](screenshots/recipe_detail.png)
 
+#### 使用したAPI（レシピ検索用）
+- Spoonacular API
+  公式ドキュメント
+  - キーワード検索用<br>Search Recipes (complexSearch): https://spoonacular.com/food-api/docs#Search-Recipes-Complex
+  - レシピ詳細表示用<br>Get Recipe Information: https://spoonacular.com/food-api/docs#Get-Recipe-Information
+  - その他参照元<br>https://spoonacular.com/food-api/docs#Authentication <br>https://spoonacular.com/food-api/docs#Quotas <br>https://spoonacular.com/food-api/docs#Show-Images
+
+※APIキーは `.env` で管理し、リポジトリには含めません。
+
 ## 画面・URL設計
 ### 操作フロー
 - アプリにアクセス：`/` → `/items/`（在庫一覧画面へ）
@@ -402,7 +411,3 @@ def recipe_detail(request, recipe_id):
 - Python 3.11
 - Django 5.0.14
 - Ubuntu 22.04（WSL上）
-
-## 注意事項
-学習用プロジェクトのため、セキュリティ面や機能の完成度は保証されません。  
-今後も機能追加・改善を続ける予定です。
