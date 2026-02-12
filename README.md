@@ -60,9 +60,8 @@
 ![レシピ一覧](screenshots/recipe_list.png)
 ![レシピ詳細](screenshots/recipe_detail.png)
 
-#### 使用したAPI（レシピ検索用）
-- Spoonacular API
-  公式ドキュメント
+#### 使用したAPI：Spoonacular API
+- 公式ドキュメント
   - キーワード検索用<br>Search Recipes (complexSearch): https://spoonacular.com/food-api/docs#Search-Recipes-Complex
   - レシピ詳細表示用<br>Get Recipe Information: https://spoonacular.com/food-api/docs#Get-Recipe-Information
   - その他参照元<br>https://spoonacular.com/food-api/docs#Authentication <br>https://spoonacular.com/food-api/docs#Quotas <br>https://spoonacular.com/food-api/docs#Show-Images
